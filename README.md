@@ -11,7 +11,7 @@ La carte centralise la gestion de l'alimentation (Li-Ion), le pilotage des moteu
 
 ## 🗺️ Architecture Système 
 
-L'interconnexion des bus système (I²C, USART, PWM) et la distribution des alimentations suivent cette implémentation :
+Le schéma architectural qu'on a conçu pour la carte :
 
 <p align="center">
 <img width="800" alt="Schéma fonctionnel" src="https://github.com/user-attachments/assets/a17226a6-bb5c-43a6-9627-ac4e2321dc44" />
