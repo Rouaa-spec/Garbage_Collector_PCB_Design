@@ -4,6 +4,10 @@
 	(generator_version "10.0")
 	(uuid "1236ad19-ec54-4dc9-9cfd-589577ff7972")
 	(paper "A4")
+	(title_block
+		(title "MCU_AND_SENSORS")
+		(date "2026-09-20")
+	)
 	(lib_symbols
 		(symbol "Connector:Conn_01x04_Pin"
 			(pin_names

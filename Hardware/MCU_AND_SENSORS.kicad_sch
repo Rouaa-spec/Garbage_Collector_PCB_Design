@@ -8,7 +8,6 @@
 		(title "MCU_AND_SENSORS")
 		(date "2026-09-20")
 		(company "ENSEA")
-		(comment 1 "Yesmine_Chakroun")
 	)
 	(lib_symbols
 		(symbol "74xGxx:74AHCT1G125"

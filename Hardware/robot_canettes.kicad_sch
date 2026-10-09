@@ -4,6 +4,10 @@
 	(generator_version "10.0")
 	(uuid "67ea9330-6bd8-4bfd-bb5f-e77247705b59")
 	(paper "A4")
+	(title_block
+		(title "MCU_AND_SENSORS")
+		(date "2026-09-20")
+	)
 	(lib_symbols)
 	(wire
 		(pts

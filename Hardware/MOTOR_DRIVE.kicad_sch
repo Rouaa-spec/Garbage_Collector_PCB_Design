@@ -4,6 +4,10 @@
 	(generator_version "10.0")
 	(uuid "e6865bed-d4db-476f-bafd-0b7c5ea0f8e2")
 	(paper "A4")
+	(title_block
+		(title "MCU_AND_SENSORS")
+		(date "2026-09-20")
+	)
 	(lib_symbols
 		(symbol "Connector:TestPoint"
 			(pin_numbers
