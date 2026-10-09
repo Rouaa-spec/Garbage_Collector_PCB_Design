@@ -72,6 +72,5 @@ Répartition sur trois bus physiques I²C indépendants pour éviter la saturati
 ├── 📂 Hardware/               # Fichiers sources CAO KiCad (.kicad_sch, .kicad_pcb en cours)
 ├── 📂 Documents/              # Livrables et visuels techniques
 │   ├── 📄 Schematic_Print.pdf # Schématique complet exporté en haute définition PDF
-│   └── 📂 Images/             # Schéma fonctionnel et captures des blocs schématiques
 └── 📄 README.md
 ```
