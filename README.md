@@ -1,72 +1,77 @@
-# 2627_ESE_PROJET_LABIB 
-- Projet élaboré par : Jaouadi Roua
-# 🤖 Autonomous Garbage Collector Robot
+# [Hardware Design] Carte Électronique de Contrôle — Robot Autonome Tri-Canettes
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Status: In Progress](https://img.shields.io/badge/Status-PCB%20Design%20Phase-orange.svg)](#-objectif-actuel--conception-du-pcb-sur-kicad)
-[![KiCad](https://img.shields.io/badge/EDA-KiCad%20v10.0-blue.svg)](https://www.kicad.org/)
-[![MCU: STM32G4](https://img.shields.io/badge/MCU-STM32G431RBT6-red.svg)](https://www.st.com/)
+Ce dépôt rassemble les fichiers de conception matérielle de la carte de contrôle dédiée à un robot autonome de collecte et de tri de déchets. 
 
-Projet d'ingénierie embarquée visant à concevoir de zéro un robot mobile autonome capable de repérer, trier et collecter des déchets (canettes métalliques rouges et vertes) sur une maquette bordée.
+La carte centralise la gestion de l'alimentation (Li-Ion), le pilotage des moteurs DC et l'acquisition des capteurs de navigation sur bus partagés.
+
+📌 **Statut du projet :** 
+* 🟧 **Routage PCB (KiCad) :** En cours de réalisation.
 
 ---
 
-## 📌 Présentation du Projet
+## 🗺️ Architecture Système 
 
-Le robot évolue sur une maquette fermée par des bordures de sécurité, comportant 4 zones distinctes :
-1. **Zone Canettes Rouges :** Zone initiale où sont disposées les canettes rouges.
-2. **Zone Canettes Vertes :** Zone initiale où sont disposées les canettes vertes.
-3. **Zone de Dépôt Rouge :** Zone de stockage des canettes rouges collectées.
-4. **Zone de Dépôt Verte :** Zone de stockage des canettes vertes collectées.
+L'interconnexion des bus système (I²C, USART, PWM) et la distribution des alimentations suivent cette implémentation :
 
----
-
-## 🎯 Objectifs & Missions (Cahier des Charges)
-
-Le développement suit une approche modulaire validée par niveaux progressifs :
-
-- **Niveau 0 (Sécurité & Déplacement) :** 
-  - Déplacement autonome avec propulsion différentielle.
-  - Sécurité mécanique garantie par la bordure périphérique de la table.
-- **Niveau 1 (Détection & Tri) :**
-  - Repérage et approche des canettes par différence de profilométrie laser.
-  - Identification de la couleur (Rouge vs Verte) via le capteur optique.
-- **Niveau 2 (Collecte & Environnement Multi-Robot) :**
-  - Transport et dépôt dans la zone dédiée selon la couleur.
-  - Navigation réactive et évitement des obstacles fixe/robots sur le terrain.
-- **Niveau 3 (Autonomie & Localisation) :**
-  - Insensibilité aux perturbations extérieures.
-  - Auto-localisation spatiale sur la maquette ($X, Y, \theta$) combinant odométrie et centrale inertielle.
+<p align="center">
+<img width="800" alt="Schéma fonctionnel" src="https://github.com/user-attachments/assets/a17226a6-bb5c-43a6-9627-ac4e2321dc44" />
+</p> 
 
 ---
 
-## 🏗️ Architecture Système Retenue
+## 🛠️ Spécifications & Choix des Composants
 
-### 1. Bloc Traitement & Contrôle Central (Intégré sur PCB)
-* **Microcontrôleur (IC) :** **STM32G431RBT6** (ARM Cortex-M4 @ 170 MHz, LQFP-64).
-* **Rôle :** Exécution de la Machine à États (FSM), calcul de l'odométrie, gestion dynamique des adresses I2C (`XSHUT`), asservissement des moteurs et décodage des encodeurs quadrature.
+### 1. Unité de Traitement & Logique (MCU)
+* **Microcontrôleur :** **STM32G431RBT6** (Cortex-M4, 170 MHz). Sélectionné pour ses timers avancés (gestion des moteurs et servo) et sa large connectivité matérielle.
 
-### 2. Bloc Perception & Environnement (4x ToF Fixes + APDS + MPU)
-* **Télémétrie Laser Multi-ToF (4x VL53L0X fixes) :** 
-  - **Avant-Centre Haut :** Détection d'obstacles hauts ou d'autres robots.
-  - **Avant-Centre Bas :** Détection dédiée des canettes au sol (permet la différenciation obstacle vs canette par corrélation verticale).
-  - **Arrière-Droit & Arrière-Gauche :** Surveillance des angles morts et évitement lors des manœuvres de recul.
-* **Capteur Couleur & Proximité (APDS-9960) :** Connecté via en-tête au fond de la pince pour la reconnaissance RGBC de la canette.
-* **Centrale Inertielle (MPU6050) :** Gyroscope/Accéléromètre I2C pour la correction de dérive et la détection de chocs inter-robots.
+### 2. Gestion de l'Énergie (Power Management)
+* **Contrôleur de Charge :** **bq25896RTWR** (Switching Charger). Assure la charge rapide de la batterie Lithium-Ion via USB-C et la gestion dynamique du chemin de puissance (Power Path).
+* **Jauge de Batterie :** **bq27220** (Fuel Gauge). Suivi précis de l'état de charge (SoC) via le bus I²C2.
+* **Régulation :** LDO **AP2112K-3.3** (600mA) pour l'alimentation stable de la section logique et des capteurs.
 
-### 3. Bloc Actionneurs & Manipulation
-* **Propulsion :** 2x Moteurs DC **CH-N20-3** (avec encodeurs intégrés), commandés par le driver **DRV8833PWPR** (TSSOP-16) directement implanté sur le PCB.
-* **Préhension :** Pince mono-servo motorisée (1x **MG90S**) pour le serrage/relâchement des canettes.
+### 3. Contrôle des Actionneurs (Motor Drive)
+* **Driver Moteurs :** **DRV8833** (Double Pont en H) pour le pilotage de 2 motoréducteurs CC (CH-N20-3) via signaux PWM (`TIM1` et `TIM3`).
+* **Servomoteur :** Sortie dédiée pour un **Servo MG90S** (Pince de préhension) piloté par le timer `TIM15`.
 
-### 4. Bloc Gestion d'Énergie 1S (Li-Ion & Power Path)
-* **Source d'Énergie :** 1x Accumulateur Li-Ion 1S ($3.7\text{V}$ nominal).
-* **Gestionnaire de Charge (IC) :** **Texas Instruments BQ25896RTWR** (WQFN-24) :
-  - Management de charge rapide via USB Type-C.
-  - Gestion automatique du chemin de puissance (*NVDC Power-Path*).
-* **Étage de Régulation PCB :**
-  - Convertisseur **Boost Step-Up 5V** pour la ligne de puissance des moteurs et du servomoteur.
-  - Régulateur **LDO 3.3V** pour l'alimentation du STM32G431RBT6 et de la chaîne de capteurs I2C.
+### 4. Acquisition Capteurs (Sensors)
+Répartition sur trois bus physiques I²C indépendants pour éviter la saturation et les conflits d'adresses :
+* **Bus I²C1 :** Centrale inertielle IMU **MPU-6050** (Odométrie).
+* **Bus I²C2 :** Section Power Management (**bq27220** et **bq25896**).
+* **Bus I²C3 :** Télémètres Laser ToF **VL53L0X** (Évitement d'obstacles) et capteur de couleur/proximité **APDS9960** (Tri des canettes). 
+  * *Note de conception :* Les broches `XSHUT` des VL53L0X sont routées vers des GPIOs du STM32 pour configurer leurs adresses de manière logicielle et séquentielle.
+
 ---
-## 🚀 Objectif Actuel : Conception du PCB sous KiCad v10
 
-Nous sommes actuellement dans la phase de **saisie schématique et de routage du PCB sur-mesure** intégrant l'ensemble des puces CMS (`STM32G431RBT6`, `BQ25896RTWR`, `DRV8833PWPR`). 
+## 📄 Dossier de Conception (Schématiques)
+
+### Étage Microcontrôleur (MCU)
+<p align="center">
+<img width="700" alt="MCU" src="https://github.com/user-attachments/assets/f04841df-3208-4843-a7be-add28e1a69e5" />
+</p> 
+
+### Gestion d'Énergie (Power Management)
+<p align="center">
+<img width="700" alt="Power Management" src="https://github.com/user-attachments/assets/d4b6c70a-bada-430d-b90c-8217d9fbbf3a" />
+</p> 
+
+### Bloc Capteurs (Sensors)
+<p align="center">
+<img width="700" alt="Sensors" src="https://github.com/user-attachments/assets/32cf09ca-8c01-4ea6-8fae-80763e91b008" />
+</p>
+
+### Commande Moteurs (Motor Drive)
+<p align="center">
+<img width="700" alt="Motor Drive" src="https://github.com/user-attachments/assets/166a9b3e-42f0-486b-bd58-d52d4fa22434" />
+</p>
+
+---
+
+## 📂 Organisation du Dépôt
+
+```text
+├── 📂 Hardware/               # Fichiers sources CAO KiCad (.kicad_sch, .kicad_pcb en cours)
+├── 📂 Documents/              # Livrables et visuels techniques
+│   ├── 📄 Schematic_Print.pdf # Schématique complet exporté en haute définition PDF
+│   └── 📂 Images/             # Schéma fonctionnel et captures des blocs schématiques
+└── 📄 README.md
+```
