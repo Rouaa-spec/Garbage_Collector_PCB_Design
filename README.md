@@ -5,7 +5,7 @@ Ce dépôt rassemble les fichiers de conception matérielle de la carte de contr
 La carte centralise la gestion de l'alimentation (Li-Ion), le pilotage des moteurs DC et l'acquisition des capteurs de navigation sur bus partagés.
 
 📌 **Statut du projet :** 
-* 🟧 **Routage PCB (KiCad) :** En cours de réalisation.
+* 🟧 **Routage PCB (KiCad) :** En cours de réalisation...
 
 ---
 
